@@ -12,6 +12,8 @@
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGTH 1080
 
+
+
 #define CHECK(expr) {                       \
         auto err = (expr);                  \
         if (err != cudaSuccess) {           \
@@ -27,6 +29,11 @@ extern "C" void invoke_mandelbrot_kernel(
         unsigned int* buffer,
         double x_start, double x_end, double y_start, double y_end,
         int width, int height, int max_iter);
+
+extern "C"
+{
+__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+}
 
 //--paleta
 //#define PALETTE_SIZE 16
@@ -58,12 +65,14 @@ std::vector<unsigned int> colors_ramp = {
         _bswap32(0xF2E660FF),
 };
 
-static const double x_start=-2;
-static const double x_end=1;
-static const double y_start=-1;
-static const double y_end=1;
+static double x_start=-2;
+static double x_end=1;
+static double y_start=-1;
+static double y_end=1;
 
 static bool paused= false;
+
+static double ZOOM_FACTOR = 0.95;
 
 GLuint textureID;
 GLuint bufferID;
@@ -88,6 +97,32 @@ void mandelbrotCuda() {
 //    cudaMemcpy(host_pixels_buffer, device_pixels_buffer, IMAGE_WIDTH*IMAGE_HEIGTH*4, cudaMemcpyDeviceToHost);
 }
 
+void zoom(double factor) {
+    double p = 0;
+
+    if(factor==1) {
+        p = 2-ZOOM_FACTOR;
+    }
+    else {
+        p = ZOOM_FACTOR;
+    }
+
+    x_start = x_start * p;
+    x_end   = x_end   * p;
+    y_start = y_start * p;
+    y_end   = y_end   * p;
+}
+
+void pan(double xdir, double ydir) {
+
+    double percentx = xdir* (x_end-x_start)/100; // 10%
+    double percenty = ydir * (y_end-y_start)/100; // 10%
+
+    x_start = x_start + percentx;
+    x_end   = x_end   + percentx;
+    y_start = y_start + percenty;
+    y_end   = y_end   + percenty;
+}
 void setup_opengl(){
     glEnable(GL_TEXTURE_2D);
 
@@ -188,8 +223,7 @@ int main() {
     int fps = 0;
     sf::Clock clockFrames;
     // run the program as long as the window is open
-    while (window.isOpen())
-    {
+    while (window.isOpen()){
         // check all the window's events that were triggered since the last iteration of the loop
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -197,7 +231,7 @@ int main() {
                 window.close();
             }
             else if(event.type==sf::Event::Resized) {
-                textOptions.setPosition(0, window.getView().getSize().y-40);
+                glViewport(0,0,event.size.width, event.size.height);
             }
             else if(event.type==sf::Event::KeyReleased) {
                 if(event.key.scancode==sf::Keyboard::Scan::Space) {
@@ -209,6 +243,30 @@ int main() {
                 }
             }
         }
+
+        if (!window.isOpen()){
+            break;
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) {
+            zoom(1);
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X)) {
+            zoom(-1);
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+            pan(-1,0);
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
+            pan(1,0);
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+            pan(0,1);
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+            pan(0,-1);
+        }
+
         if(max_iterations<100 && !paused)
             max_iterations++;
         {
