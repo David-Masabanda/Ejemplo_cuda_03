@@ -1,0 +1,12 @@
+# ninja log v5
+4	608	7301357871706983	CMakeFiles/ejemplocu03.dir/glad.cpp.obj	31e42defe0234f8a
+1	660	7301357872234756	CMakeFiles/ejemplocu03.dir/main.cpp.obj	72957ae218654294
+6	2008	7301357885628882	CMakeFiles/ejemplocu03.dir/kernel.cu.obj	11039db6cce207b9
+2009	2918	7301357894754375	CMakeFiles/ejemplocu03.dir/cmake_device_link.obj	e189ce6993f2fcd4
+2918	3262	7301357898090663	ejemplocu03.exe	610c314658887f7a
+1	371	7301358878943390	CMakeFiles/ejemplocu03.dir/main.cpp.obj	72957ae218654294
+371	1183	7301358887031545	CMakeFiles/ejemplocu03.dir/cmake_device_link.obj	e189ce6993f2fcd4
+1183	1290	7301358887929287	ejemplocu03.exe	610c314658887f7a
+1	368	7301363606016175	CMakeFiles/ejemplocu03.dir/main.cpp.obj	72957ae218654294
+368	1173	7301363614007726	CMakeFiles/ejemplocu03.dir/cmake_device_link.obj	e189ce6993f2fcd4
+1173	1379	7301363615804164	ejemplocu03.exe	610c314658887f7a
